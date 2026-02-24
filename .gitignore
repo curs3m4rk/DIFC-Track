@@ -10,3 +10,7 @@
 /DIFC-Backend/DIFC.Infrastructure/obj
 /.vs
 /DIFC-Backend/DIFC.API/DIFC.API.csproj.user
+/DIFC-Backend/DIFC.API/bin/Debug/net10.0
+/DIFC-Backend/DIFC.Application/bin/Debug/net10.0
+/DIFC-Backend/DIFC.Domain/bin/Debug/net10.0
+/DIFC-Backend/DIFC.Infrastructure/bin/Debug/net10.0
