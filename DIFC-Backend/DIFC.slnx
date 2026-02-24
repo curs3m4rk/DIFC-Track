@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="DIFC.API/DIFC.API.csproj" />
+  <Project Path="DIFC.Application/DIFC.Application.csproj" />
+  <Project Path="DIFC.Domain/DIFC.Domain.csproj" />
+  <Project Path="DIFC.Infrastructure/DIFC.Infrastructure.csproj" />
+</Solution>

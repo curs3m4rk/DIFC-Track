@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/slnx.sqlite
+/DIFC-Backend/.vs
+/DIFC-Backend/DIFC.API/obj
+/DIFC-Backend/DIFC.Application/obj
+/DIFC-Backend/DIFC.Domain/obj
+/DIFC-Backend/DIFC.Infrastructure/obj
+/.vs
+/DIFC-Backend/DIFC.API/DIFC.API.csproj.user

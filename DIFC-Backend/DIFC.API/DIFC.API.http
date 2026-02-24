@@ -1,0 +1,6 @@
+@DIFC.API_HostAddress = http://localhost:5266
+
+GET {{DIFC.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
