@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DIFC.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260224193525_InitialIdentitySetup")]
-    partial class InitialIdentitySetup
+    [Migration("20260224205122_InitialIdentitySetup-v1")]
+    partial class InitialIdentitySetupv1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
