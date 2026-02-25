@@ -1,48 +1,29 @@
 ﻿using DIFC.Application.DTOs.Auth;
-using DIFC.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
+using DIFC.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IAuthService _authService;
 
-    public AuthController(UserManager<ApplicationUser> userManager)
+    public AuthController(IAuthService authService)
     {
-        _userManager = userManager;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterRequestDTO request)
     {
-        try
-        {
-            if (request.Password != request.ConfirmPassword)
-            {
-                return BadRequest("Passwords do not match");
-            }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-            var user = new ApplicationUser
-            {
-                UserName = request.UserName,
-                FullName = request.UserName,
-                Email = request.Email
-            };
+        var result = await _authService.RegisterAsync(request);
 
-            var result = await _userManager.CreateAsync(user, request.Password);
+        if(!result.Success)
+            return BadRequest(result);
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return Ok("User registered successfully");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
-        }
+        return Ok(result.Message);
     }
 }
