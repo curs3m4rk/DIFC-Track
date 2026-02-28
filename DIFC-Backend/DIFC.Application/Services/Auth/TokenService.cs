@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens.Experimental;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DIFC.Application.Services.Auth
 {
@@ -102,5 +104,61 @@ namespace DIFC.Application.Services.Auth
             }
         }
         #endregion
+
+        #region GetPrincipalFromExpiredToken
+
+        /// <summary>
+        /// Reads and validates a JWT token even if it's expired.
+        /// 
+        /// WHY do we need this?
+        /// When the client sends their expired access token, we still need
+        /// to trust the CLAIMS inside it (userId, email, roles).
+        /// We verify the SIGNATURE is valid (token wasn't tampered with)
+        /// but we deliberately skip the expiry check.
+        /// 
+        /// If signature check fails → returns null → we reject the refresh.
+        /// This means forged/tampered tokens are still rejected.
+        /// </summary>
+        
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var jwtSettings = _config.GetSection("JwtSettings");
+
+            var tokenValidationParams = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!)),
+
+                // ← THE KEY DIFFERENCE: don't reject expired tokens here
+                ValidateLifetime = false
+            };
+
+            try
+            {
+                var principal = new JwtSecurityTokenHandler()
+                    .ValidateToken(token, tokenValidationParams, out var validatedToken);
+
+                // Extra safety check: make sure it's actually a JWT using HS256
+                // Prevents algorithm confusion attacks (e.g. someone sends "alg: none"
+                if (validatedToken is not JwtSecurityToken jwtToken ||
+                        !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return null;
+                }
+
+                return principal;
+            }
+            catch (Exception)
+            {
+                return null;
+                throw;
+            }
+        }
+
+        #endregion GetPrincipalFromExpiredToken
     }
 }

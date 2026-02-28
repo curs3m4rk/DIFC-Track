@@ -49,4 +49,31 @@ public class AuthController : ControllerBase
         return Ok(response.Data);
     }
 
+    /// <summary>
+    /// POST /api/auth/refresh
+    /// 
+    /// Called by the client when their access token expires.
+    /// Client sends the expired access token + their refresh token.
+    /// Returns a brand new access token + new refresh token.
+    /// 
+    /// The client should call this automatically (silently) when they
+    /// get a 401 response — the user never sees a "please log in" popup
+    /// unless the refresh token itself has also expired.
+    /// </summary>
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDTO request)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _authService.RefreshAsync(request);
+
+        if(!response.Success)
+        {
+            return Unauthorized(new {message = response.Error});
+        }
+
+        return Ok(response.Data);
+    }
+
 }

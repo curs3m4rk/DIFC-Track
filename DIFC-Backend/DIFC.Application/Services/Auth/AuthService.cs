@@ -5,6 +5,8 @@ using DIFC.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DIFC.Application.Services.Auth
 {
@@ -141,6 +143,110 @@ namespace DIFC.Application.Services.Auth
             }
         }
         #endregion
+
+        #region RefreshAsync
+
+        /// <summary>
+        /// Validates the existing token pair and issues a fresh one.
+        /// 
+        /// Security checks in order:
+        /// 1. Can we read the expired access token? (signature valid?)
+        /// 2. Does the refresh token exist in our DB?
+        /// 3. Does the refresh token belong to the same user as the access token?
+        /// 4. Is the refresh token still active (not expired, not revoked)?
+        /// 
+        /// If ALL pass → rotate tokens → return new pair.
+        /// If ANY fail → reject with 401.
+        /// 
+        public async Task<(bool Success, string? Error, LoginResponseDTO? Data)> RefreshAsync(RefreshTokenRequestDTO request)
+        {
+            // ── Step 1: Extract claims from the expired access token ────────
+            // This validates the signature but ignores expiry.
+            var principal = _tokenService.GetPrincipalFromExpiredToken(request.AccessToken);
+
+            if (principal is null)
+            {
+                _logger.LogWarning("Refresh failed: invalid access token provided.");
+                return (false, "Invalid access token.", null);
+            }
+
+            // Extract the userId that was baked into the JWT claims at login time
+            // JwtRegisteredClaimNames.Sub = "sub" claim = userId
+            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? principal.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+            if (userId is null)
+            {
+                _logger.LogWarning("Refresh failed: no userId claim found in access token.");
+                return (false, "Invalid access token.", null);
+
+            }
+
+            // ── Step 2: Find the refresh token in DB ────────────────────────
+            // We load the User too (Include) because we need their data
+            // to generate a new access token.
+            var storedToken = await _dbContext.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
+
+            if (storedToken is null)
+            {
+                _logger.LogWarning($"Refresh failed: refresh token not found. UserId: {userId}");
+                return (false, "Invalid refresh token.", null);
+            }
+
+            // ── Step 3: Verify the refresh token belongs to the access token's user ─
+            // Prevents one user from using another user's refresh token
+            // combined with their own access token.
+            if (storedToken.UserId != userId)
+            {
+                _logger.LogWarning($"Refresh failed: token/user mismatch. TokenUserId: {storedToken.UserId}, ClaimUserId: {userId}");
+                return (false, "Invalid refresh token.", null);
+            }
+
+            // ── Step 4: Check if the refresh token is still usable ──────────
+            if (storedToken.IsExpired)
+            {
+                _logger.LogWarning($"Refresh failed: token expired for UserId: {userId}");
+                return (false, "Refresh token has expired. Please log in again.", null);
+            }
+
+            if (storedToken.IsRevoked)
+            {
+                _logger.LogWarning($"Revoked refresh token used! Possible theft. UserId: {userId}");
+                return (false, "Refresh token has been revoked. Please log in again.", null);
+            }
+
+            // ── Step 5: TOKEN ROTATION ───────────────────────────────────────
+            // Revoke the OLD refresh token immediately.
+            // Generate a brand new refresh token.
+            // Old one can never be used again.
+            storedToken.RevokedAt = DateTime.UtcNow;
+
+            var user = storedToken.User;
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var newAccessToken = _tokenService.GenerateAccessToken(user, roles);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            newRefreshToken.UserId = user.Id;
+
+            // ── Step 6: Save new refresh token ──────────────────────────────
+            _dbContext.RefreshTokens.Add(newRefreshToken);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation($"Token refreshed successfully for {user.Email}");
+
+            return (true, null, new LoginResponseDTO
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.Token,
+                AccessTokenExpiry = DateTime.UtcNow.AddMinutes(15),
+                UserId = user.Id,
+                Email = user.Email!,
+                UserName = user.UserName,
+                Roles = roles
+            });
+        }
+        #endregion RefreshAsync
 
 
     }
