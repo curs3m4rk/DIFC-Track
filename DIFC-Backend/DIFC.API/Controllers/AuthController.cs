@@ -1,5 +1,6 @@
 ﻿using DIFC.Application.DTOs.Auth;
 using DIFC.Application.Interfaces.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -76,4 +77,32 @@ public class AuthController : ControllerBase
         return Ok(response.Data);
     }
 
+    /// <summary>
+    /// POST /api/auth/logout
+    /// 
+    /// This endpoint is [Authorize] — meaning the user must have a valid
+    /// access token to call it. This prevents random people from trying
+    /// to revoke tokens that aren't theirs.
+    /// 
+    /// WHY [Authorize] on logout?
+    /// Without it, anyone who gets hold of a refresh token string
+    /// could log out another user by revoking their token.
+    /// With [Authorize], they'd also need a valid access token
+    /// for that same user — much harder to abuse.
+    /// </summary>
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequestDTO request)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _authService.LogoutAsync(request);
+
+        if(!response.Success)
+        {
+            return BadRequest(new {message = response.Error});
+        }
+        return Ok(new {message = "Logged out successfully."});
+    }
 }

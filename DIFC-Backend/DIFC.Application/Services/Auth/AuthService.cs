@@ -248,6 +248,48 @@ namespace DIFC.Application.Services.Auth
         }
         #endregion RefreshAsync
 
+        #region LogoutAsync
+
+        /// <summary>
+        /// Revokes the refresh token, ending the session.
+        /// 
+        /// After this:
+        /// - Refresh token is dead in DB → can never get new access tokens
+        /// - Current access token lives until its 15 min natural expiry
+        ///   but that's acceptable — it'll die on its own shortly
+        ///   
+        /// </summary>
+        public async Task<(bool Success, string? Error)> LogoutAsync(LogoutRequestDTO request)
+        {
+            // ── Step 1: Find the token in DB ────────────────────────────────
+            var storedToken = await _dbContext.RefreshTokens
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
+
+            if (storedToken is null)
+            {
+                _logger.LogWarning("Logout failed: refresh token not found.");
+                return (false, "Invalid refresh token.");
+            }
+
+            // ── Step 2: Check it's not already revoked ──────────────────────
+            // Could mean duplicate logout call or a token that was already
+            // cleaned up. Not a security issue, just inform the client.
+            if(storedToken.IsRevoked)
+            {
+                _logger.LogWarning($"Logout called on already-revoked token. UserId: {storedToken.UserId}");
+                return (false, "Token is already revoked.");
+            }
+
+            // ── Step 3: Revoke it ───────────────────────────────────────────
+            storedToken.RevokedAt = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync();
+
+            _logger.LogInformation($"User {storedToken.User.Email} logged out successfully.");
+
+            return (true, null);
+        }
+        #endregion LogoutAsync
 
     }
 }
