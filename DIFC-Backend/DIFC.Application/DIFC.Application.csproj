@@ -3,10 +3,12 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DIFC.Domain\DIFC.Domain.csproj" />
+    <ProjectReference Include="..\DIFC.Infrastructure\DIFC.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

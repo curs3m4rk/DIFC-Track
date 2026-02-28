@@ -1,5 +1,5 @@
 ﻿using DIFC.Application.DTOs.Auth;
-using DIFC.Application.Interfaces;
+using DIFC.Application.Interfaces.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -26,4 +26,27 @@ public class AuthController : ControllerBase
 
         return Ok(result.Message);
     }
+
+    /// <summary>
+    /// POST /api/auth/login
+    /// Accepts email + password, returns JWT access token + refresh token.
+    /// </summary>
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _authService.LoginAsync(request);
+
+        if(!response.Success)
+        {
+            // 401 Unauthorized if user is invalid or account is locked
+            return Unauthorized(new {message = response.Error});
+        }
+
+        // 200 OK with token data if login is successful
+        return Ok(response.Data);
+    }
+
 }
