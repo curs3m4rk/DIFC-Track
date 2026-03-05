@@ -128,7 +128,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 #region DependencyInjection
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 #endregion DependencyInjection
