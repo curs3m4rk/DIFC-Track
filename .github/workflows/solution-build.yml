@@ -2,6 +2,7 @@
 name: DIFC Backend Build
 
 on:
+  workflow_dispatch:  
   push:
     branches:
       - '**'
