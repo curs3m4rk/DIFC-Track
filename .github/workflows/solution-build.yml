@@ -2,7 +2,7 @@
 name: DIFC Backend Build
 
 on:
-  pull_request:
+  push:
     branches:
       - '**'
 
