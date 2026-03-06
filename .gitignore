@@ -14,9 +14,4 @@
 /DIFC-Backend/DIFC.Application/bin/Debug/net10.0
 /DIFC-Backend/DIFC.Domain/bin/Debug/net10.0
 /DIFC-Backend/DIFC.Infrastructure/bin/Debug/net10.0
-/DIFC-FrontEnd/DIFC-UI/node_modules/.bin
-/DIFC-FrontEnd/DIFC-UI/node_modules/.vite/deps
-/DIFC-FrontEnd/DIFC-UI/node_modules/@babel
-/DIFC-FrontEnd/DIFC-UI/node_modules/@esbuild/win32-x64
-/DIFC-FrontEnd/DIFC-UI/node_modules
 /DIFC-Backend/DIFC.API/logs
