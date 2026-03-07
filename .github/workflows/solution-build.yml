@@ -1,8 +1,7 @@
-# This workflow will build a .NET project.
+# This workflow will build a .NET project
 name: DIFC Backend Build
 
 on:
-  workflow_dispatch:  
   push:
     branches:
       - '**'
