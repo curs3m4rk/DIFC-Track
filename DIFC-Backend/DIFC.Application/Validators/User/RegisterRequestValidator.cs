@@ -1,4 +1,5 @@
 ﻿using DIFC.Application.DTOs.Auth;
+using DIFC.Application.DTOs.User;
 using FluentValidation;
 
 namespace DIFC.Application.Validators.User

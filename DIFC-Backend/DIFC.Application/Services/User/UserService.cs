@@ -1,6 +1,7 @@
 ﻿using DIFC.Application.DTOs.Auth;
 using DIFC.Application.Interfaces.Auth;
 using DIFC.Application.Interfaces.User;
+using DIFC.Application.DTOs.User;
 using DIFC.Application.Services.Auth;
 using DIFC.Domain.Entities;
 using DIFC.Infrastructure.Data;
@@ -15,9 +16,9 @@ namespace DIFC.Application.Services.User
     public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<AuthService> _logger;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(UserManager<ApplicationUser> userManager, ILogger<AuthService> logger)
+        public UserService(UserManager<ApplicationUser> userManager, ILogger<UserService> logger)
         {
             _userManager = userManager;
             _logger = logger;

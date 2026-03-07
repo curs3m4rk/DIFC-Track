@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DIFC.Application.DTOs.Auth
+namespace DIFC.Application.DTOs.User
 {
     public class RegisterRequestDTO
     {
