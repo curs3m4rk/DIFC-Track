@@ -1,10 +1,13 @@
 ﻿using DIFC.API.Middleware;
 using DIFC.Application.Interfaces;
 using DIFC.Application.Interfaces.Auth;
+using DIFC.Application.Interfaces.User;
 using DIFC.Application.Services;
 using DIFC.Application.Services.Auth;
+using DIFC.Application.Services.User;
 using DIFC.Application.Validators;
 using DIFC.Application.Validators.Auth;
+using DIFC.Application.Validators.User;
 using DIFC.Domain.Entities;
 using DIFC.Infrastructure.Data;
 using FluentValidation;
@@ -121,13 +124,14 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddFluentValidationAutoValidation();.
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 #region DependencyInjection
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 #endregion DependencyInjection

@@ -1,7 +1,7 @@
 ﻿using DIFC.Application.DTOs.Auth;
 using FluentValidation;
 
-namespace DIFC.Application.Validators
+namespace DIFC.Application.Validators.User
 {
     public class RegisterRequestValidator : AbstractValidator<RegisterRequestDTO>
     {
