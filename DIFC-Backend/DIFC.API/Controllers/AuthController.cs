@@ -14,20 +14,6 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser([FromBody] RegisterRequestDTO request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var result = await _authService.RegisterAsync(request);
-
-        if(!result.Success)
-            return BadRequest(result);
-
-        return Ok(result.Message);
-    }
-
     /// <summary>
     /// POST /api/auth/login
     /// Accepts email + password, returns JWT access token + refresh token.
