@@ -16,7 +16,7 @@ namespace DIFC.API.Controllers
             _roleService = roleService;
         }
 
-        [HttpPost("createRole")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateRole([FromBody] RoleRequestDTO request)
         {
             if (!ModelState.IsValid)
@@ -48,5 +48,17 @@ namespace DIFC.API.Controllers
 
             return Ok(result.Data);
         }
+
+        [HttpGet("{roleName}")]
+        public async Task<IActionResult> GetRoleByName(string roleName)
+        {
+            var result = await _roleService.GetRoleByNameAsync(roleName);
+
+            if (!result.Success)
+                return NotFound(result.Message);
+
+            return Ok(result.Data);
+        }
+
     }
 }

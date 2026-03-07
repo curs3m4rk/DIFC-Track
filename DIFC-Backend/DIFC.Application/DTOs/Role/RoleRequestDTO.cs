@@ -6,6 +6,6 @@ namespace DIFC.Application.DTOs.Role
 {
     public class RoleRequestDTO
     {
-        public string RoleName { get; set; }
+        public string RoleName { get; set; } = string.Empty;
     }
 }
