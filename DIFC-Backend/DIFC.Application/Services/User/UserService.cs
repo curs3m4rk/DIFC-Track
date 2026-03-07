@@ -29,11 +29,6 @@ namespace DIFC.Application.Services.User
         {
             try
             {
-                if (request.Password != request.ConfirmPassword)
-                {
-                    return AuthResultDTO.FailureResult("Passwords do not match");
-                }
-
                 var user = new ApplicationUser
                 {
                     UserName = request.UserName,
