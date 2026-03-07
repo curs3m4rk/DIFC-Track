@@ -1,4 +1,4 @@
-﻿using DIFC.Application.DTOs.Auth;
+﻿using DIFC.Application.DTOs.User;
 using DIFC.Application.Interfaces.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly IUserService _authService;
+    private readonly IUserService _userService;
 
-    public UserController(IUserService authService)
+    public UserController(IUserService userService)
     {
-        _authService = authService;
+        _userService = userService;
     }
 
     [HttpPost("register")]
@@ -20,7 +20,7 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _authService.RegisterAsync(request);
+        var result = await _userService.RegisterAsync(request);
 
         if(!result.Success)
             return BadRequest(result);

@@ -1,9 +1,11 @@
 ﻿using DIFC.API.Middleware;
 using DIFC.Application.Interfaces;
 using DIFC.Application.Interfaces.Auth;
+using DIFC.Application.Interfaces.Role;
 using DIFC.Application.Interfaces.User;
 using DIFC.Application.Services;
 using DIFC.Application.Services.Auth;
+using DIFC.Application.Services.Role;
 using DIFC.Application.Services.User;
 using DIFC.Application.Validators;
 using DIFC.Application.Validators.Auth;
@@ -134,6 +136,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 #endregion DependencyInjection
 
