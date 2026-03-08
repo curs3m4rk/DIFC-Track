@@ -69,11 +69,11 @@ namespace DIFC.Application.Services.Role
 
 
         #region GetRoleByNameAsync
-        public async Task<RoleResultDTO> GetRoleByNameAsync(string roleName)
+        public async Task<RoleResultDTO> GetRoleByNameAsync(RoleRequestDTO request)
         {
             try
             {
-                var role = await _roleManager.FindByNameAsync(roleName);
+                var role = await _roleManager.FindByNameAsync(request.RoleName);
 
                 if (role == null)
                 {
@@ -100,12 +100,12 @@ namespace DIFC.Application.Services.Role
         #endregion
 
 
-        #region GetRoleByNameAsync
-        public async Task<RoleResultDTO> DeleteRoleAsync(string roleName)
+        #region DeleteRoleAsync
+        public async Task<RoleResultDTO> DeleteRoleAsync(RoleRequestDTO request)
         {
             try
             {
-                var role= await _roleManager.FindByNameAsync(roleName);
+                var role= await _roleManager.FindByNameAsync(request.RoleName);
 
                 if (role == null)
                 {

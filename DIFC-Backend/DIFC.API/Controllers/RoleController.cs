@@ -42,9 +42,9 @@ namespace DIFC.API.Controllers
         }
 
         [HttpGet("{roleName}")]
-        public async Task<IActionResult> GetRoleByName(string roleName)
+        public async Task<IActionResult> GetRoleByName([FromBody] RoleRequestDTO request)
         {
-            var result = await _roleService.GetRoleByNameAsync(roleName);
+            var result = await _roleService.GetRoleByNameAsync(request);
 
             if (!result.Success)
                 return NotFound(result.Message);
@@ -54,9 +54,9 @@ namespace DIFC.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{roleName}")]
-        public async Task<IActionResult> DeleteRole(string roleName)
+        public async Task<IActionResult> DeleteRole([FromBody] RoleRequestDTO request)
         {
-            var result = await _roleService.DeleteRoleAsync(roleName);
+            var result = await _roleService.DeleteRoleAsync(request);
 
             if (!result.Success)
                 return BadRequest(result);
