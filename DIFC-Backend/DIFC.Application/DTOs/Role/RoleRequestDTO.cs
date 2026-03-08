@@ -8,4 +8,11 @@ namespace DIFC.Application.DTOs.Role
     {
         public string RoleName { get; set; } = string.Empty;
     }
+
+    public class UpdateRoleDTO
+    {
+        public string RoleName { get; set; } = string.Empty;
+
+        public string NewRoleName { get; set; } = string.Empty;
+    }
 }

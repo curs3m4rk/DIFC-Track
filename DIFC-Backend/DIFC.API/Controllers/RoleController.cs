@@ -1,6 +1,8 @@
 ﻿using DIFC.Application.DTOs.Role;
 using DIFC.Application.Interfaces;
 using DIFC.Application.Interfaces.Role;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DIFC.API.Controllers
@@ -16,6 +18,7 @@ namespace DIFC.API.Controllers
             _roleService = roleService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateRole([FromBody] RoleRequestDTO request)
         {
@@ -39,14 +42,40 @@ namespace DIFC.API.Controllers
         }
 
         [HttpGet("{roleName}")]
-        public async Task<IActionResult> GetRoleByName(string roleName)
+        public async Task<IActionResult> GetRoleByName([FromBody] RoleRequestDTO request)
         {
-            var result = await _roleService.GetRoleByNameAsync(roleName);
+            var result = await _roleService.GetRoleByNameAsync(request);
 
             if (!result.Success)
                 return NotFound(result.Message);
 
             return Ok(result.Data);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{roleName}")]
+        public async Task<IActionResult> DeleteRole([FromBody] RoleRequestDTO request)
+        {
+            var result = await _roleService.DeleteRoleAsync(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result.Message);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{roleName}")]
+        public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleDTO request)
+        { 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var result = await _roleService.UpdateRoleAsync(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result.Message);
         }
 
     }

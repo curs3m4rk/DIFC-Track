@@ -69,11 +69,11 @@ namespace DIFC.Application.Services.Role
 
 
         #region GetRoleByNameAsync
-        public async Task<RoleResultDTO> GetRoleByNameAsync(string roleName)
+        public async Task<RoleResultDTO> GetRoleByNameAsync(RoleRequestDTO request)
         {
             try
             {
-                var role = await _roleManager.FindByNameAsync(roleName);
+                var role = await _roleManager.FindByNameAsync(request.RoleName);
 
                 if (role == null)
                 {
@@ -98,5 +98,69 @@ namespace DIFC.Application.Services.Role
             }
         }
         #endregion
+
+
+        #region DeleteRoleAsync
+        public async Task<RoleResultDTO> DeleteRoleAsync(RoleRequestDTO request)
+        {
+            try
+            {
+                var role= await _roleManager.FindByNameAsync(request.RoleName);
+
+                if (role == null)
+                {
+                    return RoleResultDTO.FailureResult(new[] { "Role not found" });
+                }
+
+                var result = await _roleManager.DeleteAsync(role);
+
+                if (!result.Succeeded)
+                {
+                    return RoleResultDTO.FailureResult(result.Errors.Select(e => e.Description));
+                }
+
+                return RoleResultDTO.SuccessResult("Role deleted successfully");
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
+
+        #region UpdateRoleAsync
+        public async Task<RoleResultDTO> UpdateRoleAsync(UpdateRoleDTO request)
+        {
+            try
+            {
+                var role = await _roleManager.FindByNameAsync(request.RoleName);
+
+                if(role == null)
+                {
+                    return RoleResultDTO.FailureResult(new[] { "Role not found" });
+                }
+
+                role.Name = request.NewRoleName;
+
+                var result = await _roleManager.UpdateAsync(role);
+
+                if (!result.Succeeded)
+                {
+                    return RoleResultDTO.FailureResult(result.Errors.Select(e => e.Description));
+                }
+
+                return RoleResultDTO.SuccessResult("Role updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
+        
     }
 }
