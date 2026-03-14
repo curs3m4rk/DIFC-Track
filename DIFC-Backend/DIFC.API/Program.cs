@@ -146,7 +146,6 @@ var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>(); // ← MUST be first, wraps everything   
 
-app.UseCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -155,6 +154,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
