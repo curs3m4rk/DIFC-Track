@@ -28,21 +28,6 @@ jobs:
       - name: Build
         run: dotnet build DIFC-Backend/DIFC.slnx --configuration Release --no-restore
 
-      # Install EF CLI
-      - name: Install EF Core CLI
-        run: dotnet tool install --global dotnet-ef
-
-      - name: Add dotnet tools to PATH
-        run: echo "$env:USERPROFILE\.dotnet\tools" >> $env:GITHUB_PATH
-
-      # Run EF migrations (equivalent to Update-Database)
-      - name: Run EF Core migrations
-        run: |
-          dotnet ef database update `
-            --project DIFC-Backend/DIFC.Infrastructure/DIFC.Infrastructure.csproj `
-            --startup-project DIFC-Backend/DIFC.API/DIFC.API.csproj `
-            --configuration Release
-
       # Publish API
       - name: Publish API
         run: dotnet publish DIFC-Backend/DIFC.API/DIFC.API.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
