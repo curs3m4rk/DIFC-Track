@@ -1,10 +1,12 @@
 ﻿using DIFC.API.Middleware;
 using DIFC.Application.Interfaces;
 using DIFC.Application.Interfaces.Auth;
+using DIFC.Application.Interfaces.Email;
 using DIFC.Application.Interfaces.Role;
 using DIFC.Application.Interfaces.User;
 using DIFC.Application.Services;
 using DIFC.Application.Services.Auth;
+using DIFC.Application.Services.Email;
 using DIFC.Application.Services.Role;
 using DIFC.Application.Services.User;
 using DIFC.Application.Validators;
@@ -137,6 +139,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 #endregion DependencyInjection
 
@@ -162,5 +165,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 app.Run();
 

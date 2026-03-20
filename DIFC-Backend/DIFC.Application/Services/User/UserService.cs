@@ -26,7 +26,7 @@ namespace DIFC.Application.Services.User
 
 
         #region RegisterAsync
-        public async Task<AuthResultDTO> RegisterAsync(RegisterRequestDTO request)
+        public async Task<GenericResultDTO> RegisterAsync(RegisterRequestDTO request)
         {
             try
             {
@@ -41,10 +41,10 @@ namespace DIFC.Application.Services.User
 
                 if (!result.Succeeded)
                 {
-                    return AuthResultDTO.FailureResult(result.Errors.Select(e => e.Description));
+                    return GenericResultDTO.FailureResult(result.Errors.Select(e => e.Description));
                 }
 
-                return AuthResultDTO.SuccessResult("User registered successfully");
+                return GenericResultDTO.SuccessResult("User registered successfully");
             }
             catch (Exception ex)
             {

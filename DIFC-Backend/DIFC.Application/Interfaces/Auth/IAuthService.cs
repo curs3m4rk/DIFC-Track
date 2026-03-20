@@ -7,5 +7,7 @@ namespace DIFC.Application.Interfaces.Auth
         Task<(bool Success, string? Error, LoginResponseDTO? Data)> LoginAsync(LoginRequestDTO request);
         Task<(bool Success, string? Error, LoginResponseDTO? Data)> RefreshAsync(RefreshTokenRequestDTO request);
         Task<(bool Success, string? Error)> LogoutAsync(LogoutRequestDTO request);
+        Task<GenericResultDTO> ForgotPasswordAsync(string email);
+        Task<GenericResultDTO> ResetPasswordAsync(ResetPasswordRequestDTO request);
     }
 }
