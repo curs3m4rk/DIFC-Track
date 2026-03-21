@@ -14,6 +14,7 @@ namespace DIFC.Infrastructure.Data
 
         /// Our custom table for refresh tokens.
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -40,7 +41,15 @@ namespace DIFC.Infrastructure.Data
                 .HasForeignKey(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<PasswordResetToken>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<PasswordResetToken>()
+                .HasIndex(p => p.TokenHash)
+                .IsUnique();
 
         }
     }

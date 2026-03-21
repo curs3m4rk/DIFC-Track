@@ -5,7 +5,7 @@ namespace DIFC.Application.Interfaces.User
 {
     public interface IUserService
     {
-        Task<AuthResultDTO> RegisterAsync(RegisterRequestDTO request);
+        Task<GenericResultDTO> RegisterAsync(RegisterRequestDTO request);
 
         //Task<List<UserDTO>> GetAllUsers(RegisterRequestDTO request);
 
