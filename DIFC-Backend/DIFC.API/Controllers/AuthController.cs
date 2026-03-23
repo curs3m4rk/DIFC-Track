@@ -91,4 +91,54 @@ public class AuthController : ControllerBase
         }
         return Ok(new {message = "Logged out successfully."});
     }
+
+    /// <summary>
+    /// POST /api/auth/forgot-password
+    ///
+    /// Step 1 of reset flow. User submits their email.
+    /// We send them a reset link if the account exists.
+    ///
+    /// [AllowAnonymous] — user is obviously not logged in
+    /// when they've forgotten their password.
+    ///
+    /// WHY always return 200 even if email doesn't exist?
+    /// Returning 404 when email not found lets attackers discover
+    /// which emails are registered in your system (user enumeration).
+    /// Always returning 200 with the same message reveals nothing.
+    /// </summary>
+    /// 
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword(
+    [FromBody] ForgotPasswordRequestDTO request)
+    {
+        var response = await _authService.ForgotPasswordAsync(request.Email);
+
+        // Always return this same message regardless of outcome
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// POST /api/auth/reset-password
+    ///
+    /// Step 3 of reset flow. User submits:
+    /// - token (from the URL they clicked in their email)
+    /// - newPassword
+    /// - confirmPassword
+    ///
+    /// On success → password changed, all sessions revoked.
+    /// On failure → generic error (don't leak reason details).
+    /// </summary>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword(
+        [FromBody] ResetPasswordRequestDTO request)
+    {
+        var response = await _authService.ResetPasswordAsync(request);
+
+        if (!response.Success)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
 }
