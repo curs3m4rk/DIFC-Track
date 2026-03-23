@@ -41,10 +41,10 @@ namespace DIFC.API.Controllers
             return Ok(roles);
         }
 
-        [HttpGet("{roleName}")]
-        public async Task<IActionResult> GetRoleByName([FromBody] RoleRequestDTO request)
+        [HttpGet("getByName/{roleName}")]
+        public async Task<IActionResult> GetRoleByName(string roleName)
         {
-            var result = await _roleService.GetRoleByNameAsync(request);
+            var result = await _roleService.GetRoleByNameAsync(roleName);
 
             if (!result.Success)
                 return NotFound(result.Message);
@@ -53,10 +53,10 @@ namespace DIFC.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{roleName}")]
-        public async Task<IActionResult> DeleteRole([FromBody] RoleRequestDTO request)
+        [HttpDelete("delete/{roleName}")]
+        public async Task<IActionResult> DeleteRole(string roleName)
         {
-            var result = await _roleService.DeleteRoleAsync(request);
+            var result = await _roleService.DeleteRoleAsync(roleName);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -65,8 +65,8 @@ namespace DIFC.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{roleName}")]
-        public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleDTO request)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateRole(UpdateRoleDTO request)
         { 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

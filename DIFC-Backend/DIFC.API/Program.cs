@@ -104,6 +104,10 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key),
 
+        //RoleClaimType need to be configured in below format as per JWT payload
+        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+
+
         // IMPORTANT: By default .NET adds 5 MINUTES of tolerance
         // to token expiry. ClockSkew = Zero means expired = expired,
         // period. This is important for security with short-lived tokens.
