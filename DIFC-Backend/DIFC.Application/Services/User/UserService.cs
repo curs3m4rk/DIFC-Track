@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using DIFC.Application.DTOs.Role;
 
 namespace DIFC.Application.Services.User
 {
@@ -53,6 +54,57 @@ namespace DIFC.Application.Services.User
             }
         }
         #endregion RegisterAsync
+
+        #region GetAllUsersAsync
+        public async Task<List<string>> GetAllUsersAsync()
+        {
+            try
+            {
+                return _userManager.Users.Select(u => u.UserName).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
+
+        #region GetRoleByNameAsync
+        public async Task<UserResultDTO> GetUserByIdAsync(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByNameAsync(userId);
+
+                if (user == null)
+                {
+                    return UserResultDTO.FailureResult(new[] { "User not found" });
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                return new UserResultDTO
+                {
+                    Success = true,
+                    Message = "User details retrieved successfully",
+                    Data = new
+                    {
+                        user.Id,
+                        user.UserName,
+                        user.Email,
+                        user.PhoneNumber,
+                        Roles=roles
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
 
     }
 }

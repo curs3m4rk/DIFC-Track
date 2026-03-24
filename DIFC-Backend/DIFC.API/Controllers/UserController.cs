@@ -28,4 +28,23 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
+    [HttpGet("getAllUsers")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _userService.GetAllUsersAsync();
+
+        return Ok(users);
+    }
+
+    [HttpGet("getById/{userId}")]
+    public async Task<IActionResult> GetUserById(string userId)
+    {
+        var result = await _userService.GetUserByIdAsync(userId);
+
+        if (!result.Success)
+            return NotFound(result.Message);
+
+        return Ok(result.Data);
+    }
+
 }
