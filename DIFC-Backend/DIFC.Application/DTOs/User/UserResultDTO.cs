@@ -2,7 +2,7 @@
 
 namespace DIFC.Application.DTOs.Auth
 {
-    public class RoleResultDTO
+    public class UserResultDTO
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
@@ -10,9 +10,9 @@ namespace DIFC.Application.DTOs.Auth
         public object Data { get; set; }
         public IEnumerable<string> Errors { get; set; }
 
-        public static RoleResultDTO SuccessResult(string message, object data = null)
+        public static UserResultDTO SuccessResult(string message, object data = null)
         {
-            return new RoleResultDTO    
+            return new UserResultDTO    
             {
                 Success = true,
                 Message = message,
@@ -20,9 +20,9 @@ namespace DIFC.Application.DTOs.Auth
             };
         }
 
-        public static RoleResultDTO FailureResult(IEnumerable<string> errors)
+        public static UserResultDTO FailureResult(IEnumerable<string> errors)
         {
-            return new RoleResultDTO
+            return new UserResultDTO
             {
                 Success = false,
                 Message = errors?.FirstOrDefault(), // ensures message is always set
@@ -30,13 +30,13 @@ namespace DIFC.Application.DTOs.Auth
             };
         }
 
-        public static RoleResultDTO FailureResult(string error)
+        public static UserResultDTO FailureResult(string error)
         {
-            return new RoleResultDTO
+            return new UserResultDTO
             {
                 Success = false,
                 Message = error,
-                Errors = new List<string> { error }
+                Errors = new List<string> { error } 
             };
         }
     }

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using DIFC.Application.DTOs.Role;
 
 namespace DIFC.Application.Services.User
 {
@@ -53,6 +54,77 @@ namespace DIFC.Application.Services.User
             }
         }
         #endregion RegisterAsync
+
+        #region GetAllUsersAsync
+        public async Task<List<UserDetailsDTO>> GetAllUsersAsync()
+        {
+            try
+            {
+                var users = _userManager.Users.ToList();
+
+                var result = new List<UserDetailsDTO>();
+
+                foreach (var user in users)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+
+                    result.Add(new UserDetailsDTO
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        FullName = user.FullName,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber,
+                        Roles = roles.ToList()
+                    });
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
+
+        #region GetRoleByNameAsync
+        public async Task<UserResultDTO> GetUserByUserNameAsync(string userName)
+        {
+            try
+            {
+                var user = await _userManager.FindByNameAsync(userName);
+
+                if (user == null)
+                {
+                    return UserResultDTO.FailureResult(new[] { "User not found" });
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                return new UserResultDTO
+                {
+                    Success = true,
+                    Message = "User details retrieved successfully",
+                    Data = new UserDetailsDTO
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        FullName = user.FullName,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber,
+                        Roles = roles.ToList()
+                    }
+            };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
 
     }
 }
