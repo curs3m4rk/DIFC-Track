@@ -36,10 +36,10 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    [HttpGet("getById/{userId}")]
-    public async Task<IActionResult> GetUserById(string userId)
+    [HttpGet("getByUsername/{userName}")]
+    public async Task<IActionResult> GetUserByUserName(string userName)
     {
-        var result = await _userService.GetUserByIdAsync(userId);
+        var result = await _userService.GetUserByUserNameAsync(userName);
 
         if (!result.Success)
             return NotFound(result.Message);
