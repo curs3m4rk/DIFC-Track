@@ -1,19 +1,25 @@
 ﻿using DIFC.Application.DTOs.Auth;
 using DIFC.Application.DTOs.Role;
 using DIFC.Application.Interfaces.Role;
+using DIFC.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DIFC.Application.Services.Role
 {
     public class RoleService : IRoleService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RoleService> _logger;
 
-        public RoleService(RoleManager<IdentityRole> roleManager, ILogger<RoleService> logger)
+        public RoleService(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ILogger<RoleService> logger)
         {
             _roleManager = roleManager;
+
+            _userManager = userManager;
+
             _logger = logger;
         }
 
@@ -161,6 +167,101 @@ namespace DIFC.Application.Services.Role
             }
         }
         #endregion
-        
+
+        #region AssignRolesAsync
+        public async Task<RoleResultDTO> AssignRolesAsync(AssignRoleRequest request)
+        {
+            try
+            {
+                var user = await _userManager.FindByNameAsync(request.UserName);
+
+                if (user == null)
+                    return RoleResultDTO.FailureResult($"User '{request.UserName}' not found.");
+
+                var existingRoles = await _userManager.GetRolesAsync(user);
+                var rolesToAssign = new List<string>();
+
+                foreach (var role in request.Roles)
+                {
+                    if (!await _roleManager.RoleExistsAsync(role))
+                        return RoleResultDTO.FailureResult($"Role '{role}' does not exist.");
+
+                    //the API can take single or multiple Roles at once as List and assign it to a user
+                    if (!existingRoles.Contains(role))
+                        rolesToAssign.Add(role);
+                }
+
+                //Do not assign role again if already assigned.
+                if (!rolesToAssign.Any())
+                    return RoleResultDTO.FailureResult("Role is already assigned.");
+
+                var result = await _userManager.AddToRolesAsync(user, rolesToAssign);
+
+                if (!result.Succeeded)
+                    return RoleResultDTO.FailureResult(result.Errors.Select(e => e.Description));
+
+                return RoleResultDTO.SuccessResult(
+                    "Roles assigned successfully.",
+                    new
+                    {
+                        UserId = request.UserName,
+                        RolesAssigned = rolesToAssign
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
+
+        #region UnassignRolesAsync
+        public async Task<RoleResultDTO> UnassignRolesAsync(AssignRoleRequest request)
+        {
+            try
+            {
+                var user = await _userManager.FindByNameAsync(request.UserName);
+                //Error if User not present
+                if (user == null)
+                    return RoleResultDTO.FailureResult($"User '{request.UserName}' not found.");
+
+                var existingRoles = await _userManager.GetRolesAsync(user);
+                var rolesToRemove = new List<string>();
+
+                foreach (var role in request.Roles)
+                {
+                    //Error if role is not present
+                    if (!await _roleManager.RoleExistsAsync(role))
+                        return RoleResultDTO.FailureResult($"Role '{role}' does not exist.");
+
+                    //Error if input role is already not assigned to the user
+                    if (!existingRoles.Contains(role))
+                        return RoleResultDTO.FailureResult($"Role '{role}' is not assigned to user.");
+
+                    rolesToRemove.Add(role);
+                }
+
+                var result = await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+
+                if (!result.Succeeded)
+                    return RoleResultDTO.FailureResult(result.Errors.Select(e => e.Description));
+
+                return RoleResultDTO.SuccessResult(
+                    "Roles removed successfully.",
+                    new
+                    {
+                        UserId = request.UserName,
+                        RolesRemoved = rolesToRemove
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        #endregion
+
     }
 }

@@ -14,5 +14,9 @@ namespace DIFC.Application.Interfaces.Role
         Task<RoleResultDTO> DeleteRoleAsync(string roleName);
 
         Task<RoleResultDTO> UpdateRoleAsync(UpdateRoleDTO request);
+
+        Task<RoleResultDTO> AssignRolesAsync(AssignRoleRequest request);
+
+        Task<RoleResultDTO> UnassignRolesAsync(AssignRoleRequest request);
     }
 }
