@@ -78,5 +78,37 @@ namespace DIFC.API.Controllers
             return Ok(result.Message);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("assign")]
+        public async Task<IActionResult> AssignRoles([FromBody] AssignRoleRequest request)
+        {
+            var result = await _roleService.AssignRolesAsync(request);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(new
+            {
+                message = result.Message,
+                roles = result.Data
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("unassign")]
+        public async Task<IActionResult> UnassignRoles([FromBody] AssignRoleRequest request)
+        {
+            var result = await _roleService.UnassignRolesAsync(request);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(new
+            {
+                message = result.Message,
+                roles = result.Data
+            });
+        }
+
     }
 }

@@ -32,4 +32,20 @@ namespace DIFC.Application.Validators.Role
         }
     }
 
+    public class UserRoleRequestValidator : AbstractValidator<AssignRoleRequest>
+    {
+        public UserRoleRequestValidator()
+        {
+            RuleFor(x => x.UserName)
+                .NotEmpty().WithMessage("UserName is required.");
+
+            RuleFor(x => x.Roles)
+                .NotNull().WithMessage("Roles list cannot be null.")
+                .Must(r => r.Any()).WithMessage("At least one role must be provided.");
+
+            RuleForEach(x => x.Roles)
+                .NotEmpty().WithMessage("Role cannot be empty.");
+        }
+    }
+
 }

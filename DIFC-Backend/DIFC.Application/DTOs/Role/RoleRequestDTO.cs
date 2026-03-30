@@ -15,4 +15,11 @@ namespace DIFC.Application.DTOs.Role
 
         public string NewRoleName { get; set; } = string.Empty;
     }
+
+    public class AssignRoleRequest
+    {
+        public string UserName { get; set; }
+        public List<string> Roles { get; set; }
+    }
+
 }
